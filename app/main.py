@@ -8,9 +8,9 @@ from app.image_hosting_handler import ImageHostingHandler
 
 load_dotenv()
 
-loglevel = os.getenv("LOG_LEVEL", "INFO")
+#loglevel = os.getenv("LOG_LEVEL", "INFO")
 
-logging.basicConfig(level=loglevel,
+logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)s %(message)s',
                     datefmt='%m/%d/%Y %I:%M:%S %p')
 

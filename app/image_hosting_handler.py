@@ -6,11 +6,13 @@ class ImageHostingHandler(BaseHandler):
    # функция принимает GET-запрос и выдает соответствующую страницу
     def do_GET(self):
         if self.path == "/":
-            self.template_response("index.html")
+            self.template_response('index.html')
         elif self.path == "/upload":
-            self.html_response("Upload page")
+            self.template_response('images.html')
         elif self.path == "/images":
-            self.html_response("images page")
+            self.template_response('upload.html')
+        elif any((self.path.endswith(ext) for ext in ['.css', '.js', '.png'])):
+            self.send_file(self.path)
         else :
             self.html_response("Not Found", 404)
 

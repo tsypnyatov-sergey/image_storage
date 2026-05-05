@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown', function (event) {
         if (event.key === 'F5' || event.key === 'Escape') {
             event.preventDefault();
-            window.location.href = 'upload.html';
+            window.location.href = 'upload';
         }
     });
     const fileListWrapper = document.getElementById('file-list-wrapper');
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const imagesTab = document.getElementById('images-tab-btn');
         const storedFiles = JSON.parse(localStorage.getItem('uploadedImages')) || [];
 
-        const isImagesPage = window.location.pathname.includes('images.html');
+        const isImagesPage = window.location.pathname.includes('images');
 
         uploadTab.classList.remove('upload__tab--active');
         imagesTab.classList.remove('upload__tab--active');
@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (uploadRedirectButton) {
         uploadRedirectButton.addEventListener('click', () => {
-            window.location.href = 'upload.html';
+            window.location.href = 'upload';
         });
     }
 
