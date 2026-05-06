@@ -16,3 +16,10 @@ class ImageHostingHandler(BaseHandler):
         else :
             self.html_response("Not Found", 404)
 
+    def do_POST(self):
+        content_length = int(self.headers['Content-Length'])
+        data_input = self.rfile.read(content_length)
+        with open("recived.jpg", "wb") as f:
+            f.write(data_input)
+        self.response("Got your file!", 'text/plain')
+
