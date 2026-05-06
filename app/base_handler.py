@@ -13,7 +13,7 @@ class BaseHandler(BaseHTTPRequestHandler):
 
     # html_response обрабатывает html запрос и выдает статус код ,и
     # проверяет, если data тип bytes, то читает файл иначе декодирует
-    def response(self, data:str | bytes, content_type: str ="text/html", status_code=200) -> None:
+    def response(self, data:str | bytes, content_type: str ="text/html", status_code=200):
         self.send_response(status_code)
         self.send_header("Content-type",content_type)
         self.end_headers()
@@ -27,7 +27,8 @@ class BaseHandler(BaseHTTPRequestHandler):
     @staticmethod
     def load_static(filename:str) -> bytes:
         try:
-            with open( STATIC_PATH/ filename, "rb") as f:
+            file_path = STATIC_PATH / filename.lstrip("/")
+            with open( file_path, "rb") as f:
                 return f.read()
         except FileNotFoundError:
             return b"Not Found"

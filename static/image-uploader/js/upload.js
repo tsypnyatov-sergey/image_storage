@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function () {
             event.preventDefault();
 
             sessionStorage.removeItem('pageWasVisited');
-            window.location.href = '../index.html';
+            window.location.href = '../index';
         }
     });
 });
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const imagesTab = document.getElementById('images-tab-btn');
         const storedFiles = JSON.parse(localStorage.getItem('uploadedImages')) || [];
 
-        const isImagesPage = window.location.pathname.includes('images.html');
+        const isImagesPage = window.location.pathname.includes('images');
 
         uploadTab.classList.remove('upload__tab--active');
         imagesTab.classList.remove('upload__tab--active');
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (imagesButton) {
         imagesButton.addEventListener('click', () => {
-            window.location.href = 'images.html';
+            window.location.href = '/images';
         });
     }
 

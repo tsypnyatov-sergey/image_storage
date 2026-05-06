@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown', function (event) {
         if (event.key === 'F5' || event.key === 'Escape') {
             event.preventDefault();
-            window.location.href = 'upload';
+            window.location.href = '/upload';
         }
     });
     const fileListWrapper = document.getElementById('file-list-wrapper');
@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (uploadRedirectButton) {
         uploadRedirectButton.addEventListener('click', () => {
-            window.location.href = 'upload';
+            window.location.href = '/upload';
         });
     }
 

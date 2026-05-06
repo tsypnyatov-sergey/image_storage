@@ -8,9 +8,9 @@ class ImageHostingHandler(BaseHandler):
         if self.path == "/":
             self.template_response('index.html')
         elif self.path == "/upload":
-            self.template_response('images.html')
-        elif self.path == "/images":
             self.template_response('upload.html')
+        elif self.path == "/images":
+            self.template_response('images.html')
         elif any((self.path.endswith(ext) for ext in ['.css', '.js', '.png'])):
             self.send_file(self.path)
         else :
