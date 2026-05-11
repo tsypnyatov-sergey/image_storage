@@ -1,19 +1,28 @@
-import os
+from __future__ import  annotations
+
+
+import logging
+
 from http.server import BaseHTTPRequestHandler
-import pathlib
+from pathlib import Path
+import logging
+from multipart import MultipartParser, parse_options_header, MultipartPart
 
 
-STATIC_DIR = os.getenv("STATIC_DIR", "static")
-STATIC_PATH = pathlib.Path(__file__).cwd().parent.resolve()/ STATIC_DIR
+from app.settings import IMAGE_EXTENSIONS, STATIC_PATH, MEDIA_DIR, MAX_FILE_SIZE
+
+
+
+logger = logging.getLogger(__name__)
 
 # в этом хэндлере должна быть описана логика работы сервера
 class BaseHandler(BaseHTTPRequestHandler):
     server_version = "0.1"
-    server_name = "Image Hosting"
+    server_name = "Image Hosting Server"
 
     # html_response обрабатывает html запрос и выдает статус код ,и
     # проверяет, если data тип bytes, то читает файл иначе декодирует
-    def response(self, data:str | bytes, content_type: str ="text/html", status_code=200):
+    def response(self, data:str | bytes, content_type: str ="text/html", status_code=200)-> None:
         self.send_response(status_code)
         self.send_header("Content-type",content_type)
         self.end_headers()
@@ -47,3 +56,44 @@ class BaseHandler(BaseHTTPRequestHandler):
         else:
             content_type = "application/octet-stream"
         self.response(self.load_static(filename),content_type)
+
+
+
+    def validate_file(self, file: MultipartPart) -> bool:
+        name, ext = file.filename.split(".")
+        if ext.lower() not in IMAGE_EXTENSIONS:
+            self.response(f"Invalid file type. Allowed types: {IMAGE_EXTENSIONS}", status_code = 400)
+            return False
+        if file.size > MAX_FILE_SIZE:
+            self.response('File too big', status_code = 400)
+            return False
+        return True
+
+
+    def parser_multipart(self, content_type: str, options:dict,
+                         content_length: int, filename: str = None) ->None:
+
+        if content_type == "multipart/form-data" and "boundary" in options:
+            parser = MultipartParser(self.rfile,boundary = options["boundary"],content_length = content_length)
+
+            for part in parser:
+                if self.validate_file(part):
+                    logger.info(f"{part.name}: File upload({part.size} bytes")
+                    part.save_as(filename)
+                else:
+                    logger.info(f"{part.name}: Invalid file({part.size} bytes)")
+
+            for part in parser.parts():
+                part.close()
+        else:
+            self.response(" Request w/out Form", 400)
+            return
+        self.response(" File uploaded successfully", 201)
+
+
+    def upload_file(self, filenmae: str = None) -> None:
+        content_type, options = parse_options_header(
+            self.headers["Content-Type"])
+        content_length = int(self.headers["Content-Length"])
+        self.parse_multipart(content_type, options, content_length, filenmae)
+

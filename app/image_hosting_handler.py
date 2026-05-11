@@ -1,10 +1,16 @@
+import logging
+
 from base_handler import BaseHandler
+
+
+logger = logging.getLogger(__name__)
 
 # в этом хэндлере должна быть описана бизнес логика
 class ImageHostingHandler(BaseHandler):
 
    # функция принимает GET-запрос и выдает соответствующую страницу
     def do_GET(self):
+        logger.info(f"GET {self.client_address[0]} {self.path}")
         if self.path == "/":
             self.template_response('index.html')
         elif self.path == "/upload":
@@ -17,9 +23,9 @@ class ImageHostingHandler(BaseHandler):
             self.html_response("Not Found", 404)
 
     def do_POST(self):
-        content_length = int(self.headers['Content-Length'])
-        data_input = self.rfile.read(content_length)
-        with open("recived.jpg", "wb") as f:
-            f.write(data_input)
-        self.response("Got your file!", 'text/plain')
+        logger.info(f"POST {self.client_address[0]} {self.path}")
+        if self.path == "/api/upload":
+            self.upload_file()
+        else:
+            self.html_response("Not Found", 404)
 

@@ -1,10 +1,12 @@
-import os
+
+
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import logging
 
 from dotenv import load_dotenv
 
 from app.image_hosting_handler import ImageHostingHandler
+from app.settings import LOG_PATH
 
 load_dotenv()
 
@@ -12,7 +14,12 @@ load_dotenv()
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)s %(message)s',
-                    datefmt='%m/%d/%Y %I:%M:%S %p')
+                    datefmt='%m/%d/%Y %I:%M:%S %p',
+                    handlers = [
+                        logging.StreamHandler()
+                        #logging.FileHandler(LOG_PATH/ "server.log")
+                    ]
+                    )
 
 logger = logging.getLogger(__name__)
 
