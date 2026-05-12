@@ -14,7 +14,7 @@ STATIC_PATH = WORKDIR/ STATIC_DIR
 MEDIA_DIR = os.getenv("MEDIA_DIR", "images")
 MEDIA_PATH = WORKDIR/ MEDIA_DIR
 
-IMAGE_EXTENSIONS = ["jpg", "jpeg", "png", "gif"]
+IMAGE_EXTENSIONS = ("jpg", "jpeg", "png", "gif")
 
 MAX_FILE_SIZE_MB = 5
 MAX_FILE_SIZE = MAX_FILE_SIZE_MB *1024*1024

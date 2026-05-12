@@ -1,6 +1,6 @@
 from __future__ import  annotations
 
-
+import json
 import logging
 
 from http.server import BaseHTTPRequestHandler
@@ -9,9 +9,7 @@ import logging
 from multipart import MultipartParser, parse_options_header, MultipartPart
 
 
-from app.settings import IMAGE_EXTENSIONS, STATIC_PATH, MEDIA_DIR, MAX_FILE_SIZE
-
-
+from app.settings import IMAGE_EXTENSIONS, STATIC_PATH, MEDIA_DIR, MAX_FILE_SIZE, MEDIA_PATH
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +29,10 @@ class BaseHandler(BaseHTTPRequestHandler):
     def html_response(self, data:str | bytes, status_code=200) -> None:
         self.response(data, "text/html", status_code)
 
+    def json_response(self, data: dict| list | str | bytes, status_code=200) -> None:
+        if isinstance(data, (dict, list)):
+            data = json.dumps(data)
+        self.response(data, "application/json", status_code)
 
     #загруаем статические файлы и кодируем их в байты
     @staticmethod
@@ -70,16 +72,16 @@ class BaseHandler(BaseHTTPRequestHandler):
         return True
 
 
-    def parser_multipart(self, content_type: str, options:dict,
+    def parse_multipart(self, content_type: str, options:dict,
                          content_length: int, filename: str = None) ->None:
-
+                                                                                    #проработать логику, что можно загрузить только один файл за раз
         if content_type == "multipart/form-data" and "boundary" in options:
             parser = MultipartParser(self.rfile,boundary = options["boundary"],content_length = content_length)
 
             for part in parser:
                 if self.validate_file(part):
                     logger.info(f"{part.name}: File upload({part.size} bytes")
-                    part.save_as(filename)
+                    part.save_as(MEDIA_PATH / (f"{filename}.{part.filename.split(".")[1]}" or part.filename))
                 else:
                     logger.info(f"{part.name}: Invalid file({part.size} bytes)")
 
@@ -91,9 +93,9 @@ class BaseHandler(BaseHTTPRequestHandler):
         self.response(" File uploaded successfully", 201)
 
 
-    def upload_file(self, filenmae: str = None) -> None:
+    def upload_file(self, filename: str = None) -> None:
         content_type, options = parse_options_header(
             self.headers["Content-Type"])
         content_length = int(self.headers["Content-Length"])
-        self.parse_multipart(content_type, options, content_length, filenmae)
+        self.parse_multipart(content_type, options, content_length, filename)
 
