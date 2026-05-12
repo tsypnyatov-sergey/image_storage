@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.INFO,
                     datefmt='%m/%d/%Y %I:%M:%S %p',
                     handlers = [
                         logging.StreamHandler()
-                        #logging.FileHandler(LOG_PATH/ "server.log")
+                        logging.FileHandler(LOG_PATH/ "server.log")
                     ]
                     )
 
