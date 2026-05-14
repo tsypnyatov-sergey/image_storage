@@ -25,7 +25,7 @@ class ImageHostingHandler(BaseHandler):
 
     def do_POST(self):
         logger.info(f"POST {self.client_address[0]} {self.path}")
-        if self.path == "/api/upload":
+        if self.path == "/upload":
             unique_id = uuid.uuid4()
             self.upload_file(str(unique_id)[:8])
         else:

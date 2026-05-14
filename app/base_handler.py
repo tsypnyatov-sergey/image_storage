@@ -9,7 +9,7 @@ import logging
 from multipart import MultipartParser, parse_options_header, MultipartPart
 
 
-from app.settings import IMAGE_EXTENSIONS, STATIC_PATH, MEDIA_DIR, MAX_FILE_SIZE, MEDIA_PATH
+from app.settings import IMAGE_EXTENSIONS, STATIC_PATH, MAX_FILE_SIZE, MEDIA_PATH
 
 logger = logging.getLogger(__name__)
 
@@ -72,8 +72,12 @@ class BaseHandler(BaseHTTPRequestHandler):
         return True
 
 
+
     def parse_multipart(self, content_type: str, options:dict,
                          content_length: int, filename: str = None) ->None:
+        logger.info(content_type)
+        logger.info(options)
+        logger.info(self.headers["Content-Type"])
                                                                                     #проработать логику, что можно загрузить только один файл за раз
         if content_type == "multipart/form-data" and "boundary" in options:
             parser = MultipartParser(self.rfile,boundary = options["boundary"],content_length = content_length)
@@ -97,5 +101,8 @@ class BaseHandler(BaseHTTPRequestHandler):
         content_type, options = parse_options_header(
             self.headers["Content-Type"])
         content_length = int(self.headers["Content-Length"])
+        logger.info(self.headers["Content-Type"])
+        logger.info(content_type)
+        logger.info(options)
         self.parse_multipart(content_type, options, content_length, filename)
 

@@ -92,10 +92,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    fileUpload.addEventListener('change', (event) => {
-        handleAndStoreFiles(event.target.files);
-        event.target.value = '';
+    fileUpload.addEventListener('change', async (event) => {
+    const file = event.target.files[0];
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch("/upload", {
+        method: "POST",
+        body: formData
     });
+
+    console.log(await res.text());
+
+    event.target.value = '';
+});
 
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
         dropzone.addEventListener(eventName, (e) => {
