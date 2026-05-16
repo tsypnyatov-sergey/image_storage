@@ -36,19 +36,22 @@ class BaseHandler(BaseHTTPRequestHandler):
 
     #загруаем статические файлы и кодируем их в байты
     @staticmethod
-    def load_static(filename:str) -> bytes:
+    def load_file(filename:str, directory: Path=STATIC_PATH) -> bytes:
         try:
-            file_path = STATIC_PATH / filename.lstrip("/")
+            file_path = (directory / filename.lstrip("/")).resolve()
+            file_path.relative_to(directory.resolve())
+
             with open( file_path, "rb") as f:
                 return f.read()
-        except FileNotFoundError:
+        except (FileNotFoundError, ValueError):
             return b"Not Found"
 
     #объединяет html_response и load_static
     def template_response(self, template_filename:str) -> None:
-        self.html_response(self.load_static(template_filename))
+        self.html_response(self.load_file(template_filename))
 
-    def send_file(self, filename:str) -> None:
+
+    def send_static_file(self, filename:str) -> None:
         if filename.endswith(".png"):
             content_type = "image/png"
         elif filename.endswith(".css"):
@@ -57,8 +60,11 @@ class BaseHandler(BaseHTTPRequestHandler):
             content_type = "text/javascript"
         else:
             content_type = "application/octet-stream"
-        self.response(self.load_static(filename),content_type)
+        self.response(self.load_file(filename),content_type)
 
+
+    def send_media_file(self, filename:str) -> None:
+        self.response(self.load_file(filename, MEDIA_PATH), "image/png")
 
 
     def validate_file(self, file: MultipartPart) -> bool:
