@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const updateTabStyles = () => {
         const uploadTab = document.getElementById('upload-tab-btn');
         const imagesTab = document.getElementById('images-tab-btn');
-        const storedFiles = JSON.parse(localStorage.getItem('uploadedImages')) || [];
 
         const isImagesPage = window.location.pathname.includes('images');
 
@@ -25,8 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const displayFiles = () => {
-        const storedFiles = JSON.parse(localStorage.getItem('uploadedImages')) || [];
+    const displayFiles = async () => {
+        const storedFiles = await fetch("/api/images").then(res => res.json()).then(data => data.images);
         fileListWrapper.innerHTML = '';
 
         if (storedFiles.length === 0) {
@@ -37,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const header = document.createElement('div');
             header.className = 'file-list-header';
             header.innerHTML = `
+                <div class="file-col file-col-image">Image</div>
                 <div class="file-col file-col-name">Name</div>
                 <div class="file-col file-col-url">Url</div>
                 <div class="file-col file-col-delete">Delete</div>
@@ -46,17 +46,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const list = document.createElement('div');
             list.id = 'file-list';
 
-            storedFiles.forEach((fileData, index) => {
+            storedFiles.forEach((filename, index) => {
                 const fileItem = document.createElement('div');
                 fileItem.className = 'file-list-item';
                 fileItem.innerHTML = `
-                    <div class="file-col file-col-name">
-                        <span class="file-icon"><img src="../image-uploader/img/icon/Group.png" alt="file icon"></span>
-                        <span class="file-name">${fileData.name}</span>
+                    <div class="file-col file-col-image">
+                        <img src="/api/images/${filename}" alt="file icon" width = 50% height = 50%>
                     </div>
-                    <div class="file-col file-col-url">https://sharefile.xyz/${fileData.name}</div>
+                    <div class="file-col file-col-name">
+                        <span class="file-name">${filename}</span>
+                    </div>
+                    <div class="file-col file-col-url">http://localhost:8000/images/${filename}</div>
                     <div class="file-col file-col-delete">
-                        <button class="delete-btn" data-index="${index}"><img src="../image-uploader/img/icon/delete.png" alt="delete icon"></button>
+                        <button onclick="deleteFile('${filename}')" class="delete-btn"><img src="../image-uploader/img/icon/delete.png" alt="delete icon"></button>
                     </div>
                 `;
                 list.appendChild(fileItem);
@@ -64,11 +66,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             container.appendChild(list);
             fileListWrapper.appendChild(container);
-            addDeleteListeners();
+//            addDeleteListeners();
         }
 
         updateTabStyles();
     };
+
+
+    const deleteFile = (filename) => {
+        fetch(`/api/images/${filename}`, {
+            method: `DELETE`
+        }).then(() => {
+            displayFiles();
+        });
+    }
 
     const addDeleteListeners = () => {
         document.querySelectorAll('.delete-btn').forEach(button => {
