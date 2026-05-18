@@ -37,7 +37,11 @@ class ImageHostingHandler(BaseHandler):
         logger.info(f"POST {self.client_address[0]} {self.path}")
         if self.path == "/api/upload":
             unique_id = uuid.uuid4()
-            self.upload_file(str(unique_id)[:8])
+            filename = self.upload_file(str(unique_id)[:8])
+            self.json_response({
+                "message": "Upload Successful",
+                "filename": filename
+            }, 201)
         else:
             self.html_response(f"POST route not found: {self.path}", 404)
 
