@@ -1,14 +1,9 @@
 import logging
 from http.server import HTTPServer
 
-from dotenv import load_dotenv
-
 from app.image_hosting_handler import ImageHostingHandler
 from app.settings import LOG_PATH
 
-load_dotenv()
-
-# loglevel = os.getenv("LOG_LEVEL", "INFO")
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)s %(message)s',
