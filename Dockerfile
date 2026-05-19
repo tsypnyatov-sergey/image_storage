@@ -3,19 +3,18 @@ FROM python:3.12-alpine
 WORKDIR /app
 
 
-RUN POETRY_NO_INTERACTION=1 \
-    POETRY_VIRTUALENVS_CREATE=0 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PATH="/app/.venv/bin:$PATH"
 
-RUN pip install poetry
+RUN pip install uv
 
-COPY pyproject.toml .
+COPY pyproject.toml uv.lock ./
 
-RUN poetry install
+RUN uv sync --frozen --no-dev
 
 COPY . .
 
 EXPOSE 8000
 
-CMD ["poetry", "run", "python", "main.py"]
+CMD ["python", "-m", "app.main"]

@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-WORKDIR = pathlib.Path().cwd().parent.resolve()
+WORKDIR = pathlib.Path(__file__).resolve().parent.parent
 
 STATIC_DIR = os.getenv("STATIC_DIR", "static")
 STATIC_PATH = WORKDIR / STATIC_DIR
