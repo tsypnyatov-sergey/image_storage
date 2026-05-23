@@ -1,5 +1,5 @@
 import logging
-from http.server import HTTPServer
+from http.server import ThreadingHTTPServer
 
 from app.image_hosting_handler import ImageHostingHandler
 from app.settings import LOG_PATH
@@ -17,11 +17,15 @@ logging.basicConfig(level=logging.INFO,
 logger = logging.getLogger(__name__)
 
 
-def run(server_address=('', 8000), server_class=HTTPServer, handler_class=ImageHostingHandler):
+def run(server_address=('', 8000),
+        server_class=ThreadingHTTPServer, #заменил HTTPServer на ThreadingHTTPServer
+        handler_class=ImageHostingHandler
+):
+
     logger.info(f'Starting server on {server_address}')
     httpd = server_class(server_address, handler_class)
-    try:
 
+    try:
         httpd.serve_forever()
     except KeyboardInterrupt:
         logger.info("Server stopped by user")

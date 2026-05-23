@@ -34,9 +34,9 @@ class ImageHostingHandler(BaseHandler):
         elif self.path == "/images":
             self.template_response('images.html')
             return
-        elif any((self.path.endswith(ext) for ext in ['.css', '.js', '.png'])):
-            self.send_static_file(self.path)
-            return
+        # elif any((self.path.endswith(ext) for ext in ['.css', '.js', '.png'])):
+        #     self.send_static_file(self.path)
+        #     return
         else:
             self.html_response(f"GET route not found: {self.path}", 404)
             return
@@ -50,7 +50,6 @@ class ImageHostingHandler(BaseHandler):
                 "message": "Upload Successful",
                 "filename": filename
             }, 201)
-            self.upload_file(str(unique_id)[:8])
             return
         else:
             self.html_response(f"POST route not found: {self.path}", 404)

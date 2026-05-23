@@ -44,12 +44,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 method: 'POST',
                 body: formData,
             })
-            if (!response.status === 201){
+            if (response.status !== 201){
                 console.error("Error uploading file:", response);
                 continue;
             }
             const data = await response.json();
-            currentUploadInput.value = `http://localhost:8000/api/images/${data.filename}`;
+            currentUploadInput.value = `http://localhost/images/${data.filename}`;
             alert("Files selected successfully! Go to the 'Images' tab to view them.");
 
 
@@ -92,9 +92,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const data = await res.json();
 
-    currentUploadInput.value = `http://localhost:8000/api/images/${data.filename}`;
+    currentUploadInput.value = `${window.location.origin}/images/${data.filename}`;
 
-    console.log(await res.text());
+    console.log(data);
 
     event.target.value = '';
 });

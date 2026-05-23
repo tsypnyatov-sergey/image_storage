@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
-from http.server import BaseHTTPRequestHandler
+from http.server import BaseHTTPRequestHandler  # заменить на threadhttp
 from pathlib import Path
 
 from multipart import MultipartParser, parse_options_header, MultipartPart
@@ -64,17 +64,28 @@ class BaseHandler(BaseHTTPRequestHandler):
         self.response(self.load_file(filename, MEDIA_PATH), "image/png")
 
     def validate_file(self, file: MultipartPart) -> bool:
-        name, ext = file.filename.split(".")
+        if not file.filename:
+            return False
+
+        if "." not in file.filename:
+            return False
+
+        name, ext = file.filename.rsplit(".", 1)  # сплит по последней точке, чтобы исключить имена "имя.имя.jpg"
+
         if ext.lower() not in IMAGE_EXTENSIONS:
-            self.response(f"Invalid file type. Allowed types: {IMAGE_EXTENSIONS}", status_code=400)
+            self.response(
+                f"Invalid file type. Allowed types: {IMAGE_EXTENSIONS}",
+                status_code=400
+            )
             return False
         if file.size > MAX_FILE_SIZE:
             self.response('File too big', status_code=400)
             return False
+
         return True
 
     def parse_multipart(self, content_type: str, options: dict,
-                        content_length: int, filename: str = None) ->str | None:
+                        content_length: int, filename: str = None) -> str | None:
         logger.info(content_type)
         logger.info(options)
         logger.info(self.headers["Content-Type"])
@@ -82,8 +93,12 @@ class BaseHandler(BaseHTTPRequestHandler):
         if content_type == "multipart/form-data" and "boundary" in options:
             parser = MultipartParser(self.rfile, boundary=options["boundary"], content_length=content_length)
 
+
+
             for part in parser:
-                if self.validate_file(part):
+                if not part.filename:
+                    continue
+                elif self.validate_file(part):
                     logger.info(f"{part.name}: File upload({part.size} bytes")
                     ext = Path(part.filename).suffix
                     uploaded_name = f'{filename}{ext}' if filename else part.filename
@@ -92,8 +107,8 @@ class BaseHandler(BaseHTTPRequestHandler):
                     logger.info(f"{part.name}: Invalid file({part.size} bytes)")
                     return
 
-            for part in parser.parts():
-                part.close()
+            # for part in parser.parts():
+            #     part.close()
         return uploaded_name
 
     def upload_file(self, filename: str = None) -> str | None:
