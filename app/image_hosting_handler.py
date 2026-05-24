@@ -42,15 +42,21 @@ class ImageHostingHandler(BaseHandler):
             return
 
     def do_POST(self):
-        logger.info(f"POST {self.client_address[0]} {self.path}")
+        logger.info(f"POST {self.client_address[0]}: {self.path}")
         if self.path == "/api/upload":
             unique_id = uuid.uuid4()
             filename = self.upload_file(str(unique_id)[:8])
-            self.json_response({
-                "message": "Upload Successful",
-                "filename": filename
-            }, 201)
-            return
+            if filename:
+                self.json_response({
+                    "message": "Upload Successful",
+                    "filename": filename
+                }, 201)
+                return
+            else:
+                self.json_response({
+                    "message": "Invalid upload file",
+                }, 400)
+                return
         else:
             self.html_response(f"POST route not found: {self.path}", 404)
             return

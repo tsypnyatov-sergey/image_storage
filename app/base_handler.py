@@ -5,6 +5,9 @@ import logging
 from http.server import BaseHTTPRequestHandler  # заменить на threadhttp
 from pathlib import Path
 
+from PIL import Image
+from io import BytesIO
+
 from multipart import MultipartParser, parse_options_header, MultipartPart
 
 from app.settings import IMAGE_EXTENSIONS, STATIC_PATH, MAX_FILE_SIZE, MEDIA_PATH
@@ -63,11 +66,14 @@ class BaseHandler(BaseHTTPRequestHandler):
     def send_media_file(self, filename: str) -> None:
         self.response(self.load_file(filename, MEDIA_PATH), "image/png")
 
+
     def validate_file(self, file: MultipartPart) -> bool:
         if not file.filename:
+            self.response("Filename is missing", status_code=400)
             return False
 
         if "." not in file.filename:
+            self.response("File has no extension", status_code=400)
             return False
 
         name, ext = file.filename.rsplit(".", 1)  # сплит по последней точке, чтобы исключить имена "имя.имя.jpg"
@@ -82,6 +88,14 @@ class BaseHandler(BaseHTTPRequestHandler):
             self.response('File too big', status_code=400)
             return False
 
+        try:
+            image=Image.open(BytesIO(file.raw))
+            image.verify()
+
+        except Exception as e:
+            self.response("File is not a valid image", status_code=400)
+            return False
+
         return True
 
     def parse_multipart(self, content_type: str, options: dict,
@@ -91,7 +105,9 @@ class BaseHandler(BaseHTTPRequestHandler):
         logger.info(self.headers["Content-Type"])
         # проработать логику, что можно загрузить только один файл за раз
         if content_type == "multipart/form-data" and "boundary" in options:
-            parser = MultipartParser(self.rfile, boundary=options["boundary"], content_length=content_length)
+            parser = MultipartParser(self.rfile,
+                                     boundary=options["boundary"],
+                                     content_length=content_length)
 
 
 
@@ -103,13 +119,15 @@ class BaseHandler(BaseHTTPRequestHandler):
                     ext = Path(part.filename).suffix
                     uploaded_name = f'{filename}{ext}' if filename else part.filename
                     part.save_as(MEDIA_PATH / uploaded_name)
+                    return uploaded_name
                 else:
-                    logger.info(f"{part.name}: Invalid file({part.size} bytes)")
-                    return
+                    logger.info(
+                        f"{part.name}: Invalid file({part.size} bytes)")
+                    return None
 
             # for part in parser.parts():
             #     part.close()
-        return uploaded_name
+        return None
 
     def upload_file(self, filename: str = None) -> str | None:
         content_type, options = parse_options_header(
