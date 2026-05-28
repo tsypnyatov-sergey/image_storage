@@ -29,31 +29,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         const MAX_SIZE_MB = 5;
         const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
 
-
-
         for (const file of files) {
             if (!allowedTypes.includes(file.type) || file.size > MAX_SIZE_BYTES) {
-                console.log("Invalid file type or size");
+                console.log('Invalid file type or size');
                 continue;
             }
 
             const formData = new FormData();
-            formData.append("file", file);
+            formData.append('file', file);
 
-            const response = await fetch('/api/upload',{
+            const response = await fetch('/api/upload', {
                 method: 'POST',
                 body: formData,
             })
-            if (response.status !== 201){
-                console.error("Error uploading file:", response);
+            if (response.status !== 201) {
+                console.error('Error uploading file:', response);
                 continue;
             }
             const data = await response.json();
-            currentUploadInput.value = `http://localhost/images/${data.filename}`;
+            currentUploadInput.value = `${window.location.origin}/images/${data.image.filename}.${data.image.file_type}`;
             alert("Files selected successfully! Go to the 'Images' tab to view them.");
 
-
         }
+
     };
 
     if (copyButton && currentUploadInput) {
@@ -79,25 +77,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    fileUpload.addEventListener('change', async (event) => {
-    const file = event.target.files[0];
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData
+    fileUpload.addEventListener('change', (event) => {
+        handleAndStoreFiles(event.target.files);
+        event.target.value = '';
     });
-
-    const data = await res.json();
-
-    currentUploadInput.value = `${window.location.origin}/images/${data.filename}`;
-
-    console.log(data);
-
-    event.target.value = '';
-});
 
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
         dropzone.addEventListener(eventName, (e) => {
@@ -111,4 +94,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     updateTabStyles();
-}); 
+});

@@ -9,7 +9,9 @@ from PIL import Image
 from io import BytesIO
 
 from multipart import MultipartParser, parse_options_header, MultipartPart
+from uuid import uuid4
 
+from app.db_manager import DBManager
 from app.settings import IMAGE_EXTENSIONS, STATIC_PATH, MAX_FILE_SIZE, MEDIA_PATH
 
 logger = logging.getLogger(__name__)
@@ -19,6 +21,7 @@ logger = logging.getLogger(__name__)
 class BaseHandler(BaseHTTPRequestHandler):
     server_version = "0.1"
     server_name = "Image Hosting Server"
+
 
     # html_response обрабатывает html запрос и выдает статус код ,и
     # проверяет, если data тип bytes, то читает файл иначе декодирует
@@ -99,7 +102,7 @@ class BaseHandler(BaseHTTPRequestHandler):
         return True
 
     def parse_multipart(self, content_type: str, options: dict,
-                        content_length: int, filename: str = None) -> str | None:
+                        content_length: int) -> dict | None:
         logger.info(content_type)
         logger.info(options)
         logger.info(self.headers["Content-Type"])
@@ -109,31 +112,59 @@ class BaseHandler(BaseHTTPRequestHandler):
                                      boundary=options["boundary"],
                                      content_length=content_length)
 
-
-
             for part in parser:
-                if not part.filename:
-                    continue
-                elif self.validate_file(part):
-                    logger.info(f"{part.name}: File upload({part.size} bytes")
+                if self.validate_file(part):
+                    unique_name = str(uuid4())[:8]
+                    logger.info(f"{part.filename}: File upload({part.size} bytes")
                     ext = Path(part.filename).suffix
-                    uploaded_name = f'{filename}{ext}' if filename else part.filename
+                    uploaded_name = f'{unique_name}{ext}'
                     part.save_as(MEDIA_PATH / uploaded_name)
-                    return uploaded_name
-                else:
-                    logger.info(
-                        f"{part.name}: Invalid file({part.size} bytes)")
-                    return None
+
+                    image_data = {
+                            'filename': unique_name,
+                            'original_name': part.filename,
+                            'size': part.size//1024,
+                            'file_type': ext.lstrip('.')
+
+                    }
+                    return image_data
+
+
+            # for part in parser:
+            #     if not part.filename:
+            #         continue
+            #
+            #     if not self.validate_file(part):
+            #         logger.info(f"{part.name}: Invalid file({part.size} bytes)")
+            #         continue
+            #
+            #     unique_name = str(uuid4())[:8]
+            #     logger.info(f"{part.filename}: File upload({part.size} bytes")
+            #     ext = Path(part.filename).suffix
+            #     uploaded_name = f'{unique_name}{ext}'
+            #
+            #     logger.info(f"Saving to: {MEDIA_PATH / uploaded_name}")
+            #
+            #     part.save_as(MEDIA_PATH / uploaded_name)
+            #
+            #     image_data = {
+            #             'filename': uploaded_name,
+            #             'original_name': part.filename,
+            #             'size': part.size//1024,
+            #             'file_type': ext.lstrip('.')
+            #
+            #     }
+            #     return image_data
 
             # for part in parser.parts():
             #     part.close()
         return None
 
-    def upload_file(self, filename: str = None) -> str | None:
+    def upload_file(self) -> str | None:
         content_type, options = parse_options_header(
             self.headers["Content-Type"])
         content_length = int(self.headers["Content-Length"])
         logger.info(self.headers["Content-Type"])
         logger.info(content_type)
         logger.info(options)
-        return self.parse_multipart(content_type, options, content_length, filename)
+        return self.parse_multipart(content_type, options, content_length)
