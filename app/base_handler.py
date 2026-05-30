@@ -3,15 +3,13 @@ from __future__ import annotations
 import json
 import logging
 from http.server import BaseHTTPRequestHandler  # заменить на threadhttp
-from pathlib import Path
-
-from PIL import Image
 from io import BytesIO
-
-from multipart import MultipartParser, parse_options_header, MultipartPart
+from pathlib import Path
 from uuid import uuid4
 
-from app.db_manager import DBManager
+from PIL import Image
+from multipart import MultipartParser, parse_options_header, MultipartPart
+
 from app.settings import IMAGE_EXTENSIONS, STATIC_PATH, MAX_FILE_SIZE, MEDIA_PATH
 
 logger = logging.getLogger(__name__)
@@ -21,7 +19,6 @@ logger = logging.getLogger(__name__)
 class BaseHandler(BaseHTTPRequestHandler):
     server_version = "0.1"
     server_name = "Image Hosting Server"
-
 
     # html_response обрабатывает html запрос и выдает статус код ,и
     # проверяет, если data тип bytes, то читает файл иначе декодирует
@@ -69,7 +66,6 @@ class BaseHandler(BaseHTTPRequestHandler):
     def send_media_file(self, filename: str) -> None:
         self.response(self.load_file(filename, MEDIA_PATH), "image/png")
 
-
     def validate_file(self, file: MultipartPart) -> bool:
         if not file.filename:
             self.response("Filename is missing", status_code=400)
@@ -92,7 +88,7 @@ class BaseHandler(BaseHTTPRequestHandler):
             return False
 
         try:
-            image=Image.open(BytesIO(file.raw))
+            image = Image.open(BytesIO(file.raw))
             image.verify()
 
         except Exception as e:
@@ -121,14 +117,13 @@ class BaseHandler(BaseHTTPRequestHandler):
                     part.save_as(MEDIA_PATH / uploaded_name)
 
                     image_data = {
-                            'filename': unique_name,
-                            'original_name': part.filename,
-                            'size': part.size//1024,
-                            'file_type': ext.lstrip('.')
+                        'filename': unique_name,
+                        'original_name': part.filename,
+                        'size': part.size // 1024,
+                        'file_type': ext.lstrip('.')
 
                     }
                     return image_data
-
 
             # for part in parser:
             #     if not part.filename:

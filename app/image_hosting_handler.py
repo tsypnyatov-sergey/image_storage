@@ -2,9 +2,9 @@ import logging
 
 from psycopg import DatabaseError
 
+from app.base_handler import BaseHandler
 from app.db_manager import DBManager
 from app.settings import MEDIA_PATH
-from app.base_handler import BaseHandler
 
 logger = logging.getLogger(__name__)
 
@@ -16,56 +16,32 @@ class ImageHostingHandler(BaseHandler):
         self.db: DBManager = DBManager()
         super().__init__(*args, **kwargs)
 
-
-
     # функция принимает GET-запрос и выдает соответствующую страницу
     def do_GET(self):
 
-
         logger.info(f"GET {self.client_address[0]} {self.path}")
 
-        if self.path.startswith("/api/"):
+        api_handlers = {
+            "/api/images": self.get_images_names,
+            "/api/images-data/": self.get_images,
+        }
 
-            if self.path == "/api/images":
-                self.get_images_names()
+        templates = {
+            "/": 'index.html',
+            "/upload": 'upload.html',
+            "/images": 'images.html',
+        }
 
-            elif self.path.startswith("/api/images-data"):
-                self.get_images()
-
-            elif self.path.startswith("/api/images/"):
-                name = self.path.split("/")[-1]
-                self.send_media_file(name)
-                return
-
-            else:
-                self.html_response("API Not Found", 404)
-                return
-
-        elif self.path.startswith("/images/"):
-            name = self.path.split("/")[-1]
-            self.send_media_file(name)
-            return
-
-        elif self.path == "/":
-            self.template_response('index.html')
-            return
-        elif self.path == "/upload":
-            self.template_response('upload.html')
-            return
-        elif self.path == "/images":
-            self.template_response('images.html')
-            return
-        # elif any((self.path.endswith(ext) for ext in ['.css', '.js', '.png'])):
-        #     self.send_static_file(self.path)
-        #     return
+        if self.path in templates:
+            self.template_response(templates[self.path])
+        elif self.path in api_handlers:
+            api_handlers[self.path]()
         else:
             self.html_response(f"GET route not found: {self.path}", 404)
-            return
 
     def do_POST(self):
-        self.db: DBManager = DBManager()
-
         logger.info(f"POST {self.client_address[0]}: {self.path}")
+
         if self.path == "/api/upload":
             image_dict = self.upload_file()
             if image_dict:
@@ -85,8 +61,8 @@ class ImageHostingHandler(BaseHandler):
             return
 
     def do_DELETE(self):
-
         logger.info(f"DELETE {self.client_address[0]}: {self.path}")
+
         if self.path.startswith('/api/images/'):
             name = self.path.split('/')[-1]
             name, file_type = name.rsplit('.', 1)
@@ -95,23 +71,33 @@ class ImageHostingHandler(BaseHandler):
     def get_images_names(self):
 
         self.json_response({
-             "images": self.db.get_images_names()
+            "images": self.db.get_images_names()
         })
-
-
 
     def get_images(self):
         images = self.db.get_images()
-        res_images = [
-            {
-                'id': i[0],
-                'filename': i[1],
-                'original_name': i[2],
-                'size': i[3],
-                'upload_time': i[4].strftime('%Y-%m-%d %H:%M:%S'),
-                'file_type': i[5]
-            }
-            for i in images]
+
+        res_images = []
+
+        for i in images:
+            upload_time = i[4]
+
+            if upload_time:
+                if hasattr(upload_time, 'strftime'):
+                    upload_time = upload_time.strftime('%Y-%m-%d %H:%M:%S')
+                else:
+                    upload_time = str(upload_time)
+            else:
+                upload_time = None
+
+            res_images.append({
+                    'id': i[0],
+                    'filename': i[1],
+                    'original_name': i[2],
+                    'size': i[3],
+                    'upload_time': upload_time,
+                    'file_type': i[5]
+                })
         self.json_response({
             'images': res_images
         })
@@ -129,8 +115,3 @@ class ImageHostingHandler(BaseHandler):
         except DatabaseError:
             logger.info(f"{name} not found in database (on delete)")
             self.json_response({'message': 'Image not found'}, 404)
-
-
-
-
-

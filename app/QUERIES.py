@@ -18,7 +18,10 @@ WHERE filename = %s
 '''
 
 GET_ALL_IMAGES = '''
-SELECT * FROM images'''
+SELECT id, filename, original_name, size, upload_time, file_type 
+FROM images
+ORDER BY upload_time DESC
+'''
 
 GET_IMAGES_NAMES = '''
 SELECT filename || '.' || file_type FROM images'''
