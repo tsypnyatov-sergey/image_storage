@@ -119,40 +119,12 @@ class BaseHandler(BaseHTTPRequestHandler):
                     image_data = {
                         'filename': unique_name,
                         'original_name': part.filename,
-                        'size': part.size // 1024,
+                        'size': part.size,
                         'file_type': ext.lstrip('.')
 
                     }
                     return image_data
 
-            # for part in parser:
-            #     if not part.filename:
-            #         continue
-            #
-            #     if not self.validate_file(part):
-            #         logger.info(f"{part.name}: Invalid file({part.size} bytes)")
-            #         continue
-            #
-            #     unique_name = str(uuid4())[:8]
-            #     logger.info(f"{part.filename}: File upload({part.size} bytes")
-            #     ext = Path(part.filename).suffix
-            #     uploaded_name = f'{unique_name}{ext}'
-            #
-            #     logger.info(f"Saving to: {MEDIA_PATH / uploaded_name}")
-            #
-            #     part.save_as(MEDIA_PATH / uploaded_name)
-            #
-            #     image_data = {
-            #             'filename': uploaded_name,
-            #             'original_name': part.filename,
-            #             'size': part.size//1024,
-            #             'file_type': ext.lstrip('.')
-            #
-            #     }
-            #     return image_data
-
-            # for part in parser.parts():
-            #     part.close()
         return None
 
     def upload_file(self) -> str | None:

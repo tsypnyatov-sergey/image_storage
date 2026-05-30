@@ -84,7 +84,7 @@ class ImageHostingHandler(BaseHandler):
 
             if upload_time:
                 if hasattr(upload_time, 'strftime'):
-                    upload_time = upload_time.strftime('%Y-%m-%d %H:%M:%S')
+                    upload_time = upload_time.strftime('%Y-%m-%d %H:%M')
                 else:
                     upload_time = str(upload_time)
             else:

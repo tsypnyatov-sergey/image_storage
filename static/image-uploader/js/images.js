@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
     document.addEventListener('keydown', function (event) {
-        if (event.key === 'F5' || event.key === 'Escape') {
-            event.preventDefault();
+        if (event.key === 'Escape') {
             window.location.href = '/upload';
         }
     });
@@ -24,6 +23,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
+    function formatSize(bytes) {
+        if (!bytes) return '-';
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
 
 
     const displayFiles = async () => {
@@ -40,6 +46,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             header.innerHTML = `
                 <div class="file-col file-col-image">Image</div>
                 <div class="file-col file-col-name">Name</div>
+                <div class="file-col file-col-date">Date</div>
+                <div class="file-col file-col-size">Size</div>
                 <div class="file-col file-col-url">Url</div>
                 <div class="file-col file-col-delete">Delete</div>
             `;
@@ -59,11 +67,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <div class="file-col file-col-name">
                         <span class="file-name">${image.original_name}</span>
                     </div>
-                    <div class="file-col file-col-url"><a href="${imageUrl}" target="_blank">${imageUrl}</a></div>
+                    <div class="file-col file-col-date">
+                        ${image.upload_time ? `${image.upload_time}` : '—'}
+                    </div>
+                    <div class="file-col file-col-size">
+                        ${formatSize(image.size)}
+                    </div>
+                    <div class="file-col file-col-url">
+                        <a href="${imageUrl}" target="_blank">${imageUrl}</a>
+                    </div>
                     <div class="file-col file-col-delete">
-                        <button data-filename="${image.filename}.${image.file_type}" class="delete-btn"><img src="/static/image-uploader/img/icon/delete.png" alt="delete icon"></button>
+                        <button data-filename="${image.filename}.${image.file_type}" class="delete-btn">
+                            <img src="/static/image-uploader/img/icon/delete.png" alt="delete icon">
+                        </button>
                     </div>
                 `;
+
+
                 list.appendChild(fileItem);
             });
 

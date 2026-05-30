@@ -1,10 +1,11 @@
 body {
     background-color: #F2F5FF;
     font-family: "Inter", sans-serif;
-    color: rgb(255, 255, 255);
+    color: #111;
 }
 
-/* Header */
+/* ================= HEADER ================= */
+
 .header {
     display: flex;
     flex-direction: column;
@@ -16,7 +17,6 @@ body {
     text-align: center;
     font-size: 16px;
     width: 700px;
-
 }
 
 .header__text {
@@ -24,7 +24,8 @@ body {
     font-size: 14px;
 }
 
-/* button */
+/* ================= BUTTON ================= */
+
 .header__button {
     display: flex;
     justify-content: center;
@@ -37,14 +38,15 @@ body {
     padding: 12px 16px;
     font-size: 12px;
     background-color: rgb(0, 96, 255);
-    color: rgb(255, 255, 255);
+    color: #fff;
     width: 160px;
     height: 40px;
     border: none;
     border-radius: 7px;
 }
 
-/* hero__img */
+/* ================= HERO ================= */
+
 .hero {
     display: flex;
     justify-content: center;
@@ -65,20 +67,20 @@ body {
     object-fit: cover;
 }
 
-/* upload */
+/* ================= UPLOAD ================= */
+
 .upload__intro {
     display: flex;
     flex-direction: column;
     align-items: center;
     padding-top: 30px;
     text-align: center;
-    color: black;
+    color: #000;
 }
 
 .upload__title {
     font-size: 16px;
     width: 700px;
-
 }
 
 .upload__description {
@@ -86,36 +88,34 @@ body {
     width: 400px;
 }
 
-/* upload-tabs */
+/* ================= TABS ================= */
+
 .upload__tabs {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 15px;
     padding-top: 50px;
-
 }
 
 .upload__tab {
     all: unset;
     font-size: 20px;
     font-weight: bold;
-    color: rgb(173, 192, 248); /* Неактивный цвет по умолчанию */
+    color: rgb(173, 192, 248);
+    cursor: pointer;
 }
 
 .upload__tab--active {
-    color: rgb(0, 96, 255); /* Активный цвет */
+    color: rgb(0, 96, 255);
 }
 
 .upload__tab:hover {
     color: rgb(105, 141, 250);
 }
 
-.upload__tab:hover {
-    color: rgb(105, 141, 250);
-}
+/* ================= FORM ================= */
 
-/* upload-form */
 .upload__form {
     display: flex;
     flex-direction: column;
@@ -140,7 +140,7 @@ body {
 
 .upload__promt {
     padding-top: 24px;
-    color: rgb(11, 11, 11);
+    color: #111;
 }
 
 .upload__info {
@@ -149,7 +149,8 @@ body {
     color: rgb(173, 192, 248);
 }
 
-/* upload-button */
+/* ================= BUTTON UPLOAD ================= */
+
 .upload__button {
     padding-top: 30px;
     padding-bottom: 50px;
@@ -159,7 +160,7 @@ body {
     display: inline-block;
     text-align: center;
     cursor: pointer;
-    color: rgb(255, 255, 255);
+    color: #fff;
     width: 540px;
     height: 40px;
     border-radius: 7px;
@@ -168,7 +169,8 @@ body {
     border: none;
 }
 
-/* upload-current */
+/* ================= CURRENT UPLOAD ================= */
+
 .upload__container {
     display: flex;
     flex-direction: column;
@@ -183,13 +185,13 @@ body {
 }
 
 .upload__title-current {
-    color: black;
+    color: #000;
     padding-bottom: 10px;
     font-size: 16px;
-    text-align: left;
 }
 
-/* input + button */
+/* input */
+
 .upload__label {
     display: flex;
     align-items: center;
@@ -200,7 +202,7 @@ body {
     border-radius: 12px;
     padding: 0 16px;
     box-sizing: border-box;
-    background-color: white;
+    background-color: #fff;
 }
 
 .upload__input {
@@ -209,8 +211,7 @@ body {
     outline: none;
     font-size: 14px;
     background-color: transparent;
-    color: black;
-
+    color: #000;
 }
 
 .upload__copy {
@@ -219,110 +220,97 @@ body {
     border-radius: 12px;
     border: none;
     background-color: rgb(0, 96, 255);
-    color: white;
+    color: #fff;
     font-size: 12px;
     cursor: pointer;
 }
 
+/* ================= FILE LIST ================= */
 
-/* Container for the entire table */
 .file-list-container {
-    max-width: 800px;
-    margin: 0 auto;
+    max-width: 900px;
+    margin: 0 auto 292px;
     padding: 20px;
-    border-radius: 8px;
-    margin-bottom: 292px;
 }
 
-/* Common style for a row (both header and list item) */
+/* HEADER + ROWS */
+
 .file-list-header,
 .file-list-item {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 80px 2fr 160px 100px 2.5fr 80px;
     align-items: center;
-    padding: 10px 0;
+    gap: 12px;
+    padding: 12px 0;
     border-bottom: 1px solid #eef0f5;
 }
 
-/* Remove border from the last item */
-.file-list-item:last-child {
-    border-bottom: none;
-}
+/* HEADER */
 
-/* List header */
 .file-list-header {
     color: #8a96b1;
     font-size: 14px;
     font-weight: 500;
 }
 
-/* Styles for columns */
+/* CELLS */
+
 .file-col {
+    min-width: 0;
     display: flex;
     align-items: center;
 }
 
-.file-col-image {
-    flex-basis: 20%;
-}
-
-
-.file-col-name {
-    flex-basis: 30%;
-}
-
-.file-col-url {
-    flex-basis: 50%;
-    color: #555;
+.file-col-date,
+.file-col-size {
+    color: #666;
     font-size: 14px;
 }
 
-.file-col-delete {
-    flex-basis: 10%;
-    justify-content: center;
+/* IMAGE */
+
+.file-col-image img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
 }
 
-/* File icon */
-.file-icon {
-    color: #0060ff;
-    margin-right: 15px;
-    font-size: 20px;
-}
+/* NAME */
 
-.delete-img {
-    width: 32px;
-    height: 32px;
-}
-
-/* File name */
 .file-name {
     color: #333;
     font-weight: 500;
-    max-width: 200px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* Delete button */
-.delete-btn {
-    background: transparent;
-    /* REMOVE THE BACKGROUND, MAKE IT TRANSPARENT */
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    transition: opacity 0.2s ease;
-    /* Add a smooth transition for hover effect */
+/* URL */
+
+.file-col-url {
+    font-size: 14px;
+    color: #555;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-/* Hover effect */
-.delete-btn:hover {
+/* DELETE */
+
+.file-col-delete {
+    display: flex;
+    justify-content: center;
+}
+
+.delete-btn {
     background: transparent;
-    /* REMOVE BACKGROUND ON HOVER */
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: opacity 0.2s ease;
+}
+
+.delete-btn:hover {
     opacity: 0.7;
-    /* Make the icon semi-transparent for user feedback */
 }
