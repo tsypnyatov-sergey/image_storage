@@ -1,5 +1,8 @@
 import os
-from typing import Optional
+from math import ceil
+from typing import Optional, Any
+
+import logging
 
 from dotenv import load_dotenv
 from psycopg import Connection, connect, ProgrammingError, OperationalError
@@ -7,7 +10,8 @@ from psycopg.abc import Params
 from psycopg.rows import tuple_row
 
 from app.QUERIES import ADD_IMAGE, GET_IMAGES_NAMES, DELETE_IMAGE_BY_NAME, \
-    GET_ALL_IMAGES, CREATE_TABLE
+    GET_ALL_IMAGES, CREATE_TABLE, GET_IMAGES_COUNT
+from app.settings import IMAGE_LIMIT
 
 load_dotenv()
 DB = {
@@ -19,7 +23,7 @@ DB = {
 }
 
 DSN = f"postgresql://{DB['user']}:{DB['password']}@{DB['host']}:{DB['port']}/{DB['dbname']}"
-
+logger = logging.getLogger(__name__)
 
 class DBManager:
     def __init__(self, db_config: dict = None, row_factory=tuple_row):
@@ -28,7 +32,7 @@ class DBManager:
         self._connection: Optional[Connection] = None
         self.row_factory = row_factory
 
-        self.init_tables()
+        #self.init_tables()
 
     def _execute(self, query, data: Params = None, fetch: bool = True,
                  fetch_all: bool = True) -> list | None:
@@ -52,8 +56,8 @@ class DBManager:
     def fetch_all(self, query, data: Params = None) -> list | None:
         return self._execute(query, data)
 
-    def fetch_one(self, query, data: Params = None) -> list | None:
-        return self._execute(query, data, fetch_all=False)
+    def fetch_one(self, query, data: Params = None) -> Any:
+        return self._execute(query, data, fetch_all=False)[0]
 
     def execute(self, query, data: Params = None) -> list | None:
         return self._execute(query, data, fetch=False, fetch_all=False)
@@ -64,11 +68,17 @@ class DBManager:
     def get_images_names(self):
         return self.fetch_all(GET_IMAGES_NAMES)
 
-    def get_images(self):
-        return self.fetch_all(GET_ALL_IMAGES)
+    def get_images(self, page: int):
+        offset = (page - 1) * IMAGE_LIMIT
+        logger.info(f"offset: {offset}")
+        return self.fetch_all(GET_ALL_IMAGES, (offset,))
 
     def delete_image(self, name):
         self.execute(DELETE_IMAGE_BY_NAME, (name,))
 
     def init_tables(self):
         self.execute(CREATE_TABLE)
+
+    def has_next(self, page):
+        images_count = self.fetch_one(GET_IMAGES_COUNT)
+        return ceil(images_count / IMAGE_LIMIT) > page

@@ -26,12 +26,14 @@ class BaseHandler(BaseHTTPRequestHandler):
         self.send_response(status_code)
         self.send_header("Content-type", content_type)
         self.end_headers()
-        self.wfile.write(data if isinstance(data, bytes) else data.encode("utf-8"))
+        self.wfile.write(
+            data if isinstance(data, bytes) else data.encode("utf-8"))
 
     def html_response(self, data: str | bytes, status_code=200) -> None:
         self.response(data, "text/html", status_code)
 
-    def json_response(self, data: dict | list | str | bytes, status_code=200) -> None:
+    def json_response(self, data: dict | list | str | bytes,
+                      status_code=200) -> None:
         if isinstance(data, (dict, list)):
             data = json.dumps(data)
         self.response(data, "application/json", status_code)
@@ -124,6 +126,11 @@ class BaseHandler(BaseHTTPRequestHandler):
 
                     }
                     return image_data
+
+                else:
+                    logger.info(
+                        f"{part.name}: Invalid file ({part.size} bytes)")
+                    return None
 
         return None
 

@@ -1,10 +1,10 @@
 body {
     background-color: #F2F5FF;
     font-family: "Inter", sans-serif;
-    color: #111;
+    color: rgb(255, 255, 255);
 }
 
-/* ================= HEADER ================= */
+/* Header */
 
 .header {
     display: flex;
@@ -24,7 +24,7 @@ body {
     font-size: 14px;
 }
 
-/* ================= BUTTON ================= */
+/* button */
 
 .header__button {
     display: flex;
@@ -45,7 +45,7 @@ body {
     border-radius: 7px;
 }
 
-/* ================= HERO ================= */
+/* hero__img */
 
 .hero {
     display: flex;
@@ -67,7 +67,7 @@ body {
     object-fit: cover;
 }
 
-/* ================= UPLOAD ================= */
+/* upload */
 
 .upload__intro {
     display: flex;
@@ -88,7 +88,7 @@ body {
     width: 400px;
 }
 
-/* ================= TABS ================= */
+/* upload-tabs */
 
 .upload__tabs {
     display: flex;
@@ -114,7 +114,7 @@ body {
     color: rgb(105, 141, 250);
 }
 
-/* ================= FORM ================= */
+/* upload-form */
 
 .upload__form {
     display: flex;
@@ -149,7 +149,7 @@ body {
     color: rgb(173, 192, 248);
 }
 
-/* ================= BUTTON UPLOAD ================= */
+/* upload-button */
 
 .upload__button {
     padding-top: 30px;
@@ -169,7 +169,7 @@ body {
     border: none;
 }
 
-/* ================= CURRENT UPLOAD ================= */
+/* upload-current */
 
 .upload__container {
     display: flex;
@@ -190,7 +190,7 @@ body {
     font-size: 16px;
 }
 
-/* input */
+/* input + button */
 
 .upload__label {
     display: flex;
@@ -225,15 +225,15 @@ body {
     cursor: pointer;
 }
 
-/* ================= FILE LIST ================= */
+/* Container for the entire table */
 
 .file-list-container {
     max-width: 900px;
-    margin: 0 auto 292px;
-    padding: 20px;
+    margin: 0 auto 40px;
+    padding: 10px;
 }
 
-/* HEADER + ROWS */
+/* Common style for a row (both header and list item) */
 
 .file-list-header,
 .file-list-item {
@@ -245,7 +245,7 @@ body {
     border-bottom: 1px solid #eef0f5;
 }
 
-/* HEADER */
+/* List header */
 
 .file-list-header {
     color: #8a96b1;
@@ -253,7 +253,7 @@ body {
     font-weight: 500;
 }
 
-/* CELLS */
+/* Styles for columns */
 
 .file-col {
     min-width: 0;
@@ -267,7 +267,7 @@ body {
     font-size: 14px;
 }
 
-/* IMAGE */
+/* image */
 
 .file-col-image img {
     width: 60px;
@@ -276,7 +276,7 @@ body {
     border-radius: 6px;
 }
 
-/* NAME */
+/* name */
 
 .file-name {
     color: #333;
@@ -286,7 +286,7 @@ body {
     text-overflow: ellipsis;
 }
 
-/* URL */
+/* url */
 
 .file-col-url {
     font-size: 14px;
@@ -296,7 +296,7 @@ body {
     white-space: nowrap;
 }
 
-/* DELETE */
+/* delete */
 
 .file-col-delete {
     display: flex;
@@ -313,4 +313,15 @@ body {
 
 .delete-btn:hover {
     opacity: 0.7;
+}
+
+/* Отделяем таблицу от пагинации */
+#file-list-wrapper {
+    margin-bottom: 60px;
+}
+
+/* Двигаем пагинацию вниз и даём ей “воздух” */
+#pagination-wrapper {
+    margin-top: 60px;
+    margin-bottom: 60px;
 }

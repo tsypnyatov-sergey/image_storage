@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import urlparse, parse_qs, urlsplit
 
 from psycopg import DatabaseError
 
@@ -18,24 +19,20 @@ class ImageHostingHandler(BaseHandler):
 
     # функция принимает GET-запрос и выдает соответствующую страницу
     def do_GET(self):
+        logger.info(f"GET {self.client_address[0]}: {self.path}")
 
-        logger.info(f"GET {self.client_address[0]} {self.path}")
-
-        api_handlers = {
-            "/api/images": self.get_images_names,
-            "/api/images-data/": self.get_images,
-        }
-
-        templates = {
-            "/": 'index.html',
-            "/upload": 'upload.html',
-            "/images": 'images.html',
-        }
-
-        if self.path in templates:
-            self.template_response(templates[self.path])
-        elif self.path in api_handlers:
-            api_handlers[self.path]()
+        if self.path == '/':
+            self.template_response('index.html')
+        elif self.path == '/upload':
+            self.template_response('upload.html')
+        elif self.path.startswith('/images'):
+            self.template_response('images.html')
+        elif self.path.startswith('/api/images-data'):
+            path = urlsplit(self.path)
+            page = int(path.query.split('=')[1]) if path.query else 1
+            self.get_images(page)
+        elif self.path.startswith('/api/images'):
+            self.get_images_names()
         else:
             self.html_response(f"GET route not found: {self.path}", 404)
 
@@ -74,8 +71,13 @@ class ImageHostingHandler(BaseHandler):
             "images": self.db.get_images_names()
         })
 
-    def get_images(self):
-        images = self.db.get_images()
+    def get_images(self, page: int):
+
+        images = self.db.get_images(page)
+        print("IMAGES TYPE:", type(images))
+
+        has_next = self.db.has_next(page)
+        print("HAS_NEXT:", has_next, type(has_next))
 
         res_images = []
 
@@ -99,7 +101,8 @@ class ImageHostingHandler(BaseHandler):
                     'file_type': i[5]
                 })
         self.json_response({
-            'images': res_images
+            'images': res_images,
+            'has_next': has_next
         })
 
     def delete_image(self, name: str, file_type: str):

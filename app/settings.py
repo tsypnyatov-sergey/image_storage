@@ -23,3 +23,5 @@ LOG_PATH = WORKDIR / LOGDIR
 
 MEDIA_PATH.mkdir(parents=True, exist_ok=True)
 LOG_PATH.mkdir(parents=True, exist_ok=True)
+
+IMAGE_LIMIT = 10
