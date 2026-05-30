@@ -1,10 +1,10 @@
-# Image Storage 📸
+# Image Storage 
 
-Сервис где можно загружать картинки и получать ссылки. Типа как Imgur но проще.
+Сервис где можно загружать картинки и получать ссылки. 
 
-## 🚀 Как запустить
+## Как запустить
 
-### Через Docker (проще всего)
+### Через Docker 
 ```bash
 docker compose up --build
 ```
@@ -14,7 +14,7 @@ docker compose up --build
 - http://localhost/upload - загрузить картинку
 - http://localhost/images - смотреть все картинки
 
-### Локально (если хочешь мучиться)
+### Локально 
 ```bash
 pip install -r requirements.txt
 # создай .env файл
@@ -22,36 +22,37 @@ python -m app.main
 # запусти Nginx отдельно если нужно
 ```
 
-## 📁 Что где лежит
+##  Что где лежит
 
 ```
 image_storage/
-├── app/                    # Python код (вот здесь вся логика)
-│   ├── main.py            # Запускает сервер
+├── app/                          # Python код (Backend)
+│   ├── main.py                   # Запускает сервер
 │   ├── image_hosting_handler.py  # Обрабатывает запросы
-│   ├── base_handler.py    # Общие функции
-│   ├── db_manager.py      # Работает с базой
-│   ├── QUERIES.py         # SQL запросы
-│   └── settings.py        # Конфиг
+│   ├── base_handler.py           # Общие функции
+│   ├── db_manager.py             # Работает с базой
+│   ├── QUERIES.py                # SQL запросы
+│   └── settings.py               # Конфиг
 │
-├── static/                # HTML, CSS, JS (то что видишь в браузере)
+├── static/                       # HTML, CSS, JS (Frontend)
 │   ├── index.html
 │   ├── upload.html
 │   ├── images.html
 │   └── image-uploader/
 │       ├── css/
+│       └── img/
 │       └── js/
 │
-├── images/                # Папка с картинками (создается сама)
-├── logs/                  # Логи (тоже создается сама)
-├── docker-compose.yml     # Конфиг Docker
-├── nginx.conf             # Конфиг Nginx
-├── Dockerfile             # Как собрать контейнер
-├── pyproject.toml         # Какие библиотеки нужны
-└── .env.example           # Пример переменных окружения
+├── images/                       # Папка с картинками (создается сама)
+├── logs/                         # Логи 
+├── docker-compose.yml            # Конфиг Docker
+├── nginx.conf                    # Конфиг Nginx
+├── Dockerfile                    # Как собрать контейнер
+├── pyproject.toml                # Какие библиотеки нужны
+└── .env.example                  # Пример переменных окружения
 ```
 
-## 🔧 Конфигурация
+##  Конфигурация
 
 Создай `.env` файл (скопируй из `.env.example`):
 
@@ -63,14 +64,14 @@ POSTGRES_HOST=db
 POSTGRES_PORT=5432
 ```
 
-## 📡 Что можно делать
+## Что можно делать
 
 ### Страницы
 - `/` - главная страница
 - `/upload` - загрузить картинку
 - `/images` - список всех картинок
 
-### API (для программистов)
+### API 
 ```bash
 # Получить список картинок (первая страница)
 curl http://localhost/api/images-data/?page=1
@@ -82,7 +83,7 @@ curl -X POST -F "file=@photo.jpg" http://localhost/api/upload
 curl -X DELETE http://localhost/api/images/filename.jpg
 ```
 
-## 📊 Что работает
+##  Что работает
 
 ✅ **Главная страница** - просто текст и ссылки  
 ✅ **Загрузка** - может загружать .jpg, .png, .gif (макс 5 МБ)  
@@ -90,7 +91,7 @@ curl -X DELETE http://localhost/api/images/filename.jpg
 ✅ **Пагинация** - показывает по 10 картинок на странице  
 ✅ **Удаление** - кнопка удалить рядом с каждой картинкой  
 
-## 🗄️ База данных
+##  База данных
 
 У нас одна таблица `images`:
 
@@ -98,7 +99,7 @@ curl -X DELETE http://localhost/api/images/filename.jpg
 id         - порядковый номер
 filename   - имя файла на сервере (генерируется сами)
 original_name - имя которое загрузил пользователь
-size       - размер в кБ
+size       - размер в байтах
 upload_time - когда загрузили
 file_type  - jpg/png/gif
 ```
@@ -109,7 +110,7 @@ file_type  - jpg/png/gif
 2 | e5f6g7h8 | cat.png       | 512 | 2025-05-29 | png
 ```
 
-## 🐳 Docker (что это и зачем)
+##  Docker 
 
 Контейнеры работают отдельно:
 
@@ -125,7 +126,7 @@ docker compose logs -f app     # смотреть логи Python
 docker compose exec app bash   # зайти внутрь контейнера
 ```
 
-## 🔍 Логи
+##  Логи
 
 Логи пишутся в `logs/app.log`:
 
@@ -136,7 +137,7 @@ docker compose exec app bash   # зайти внутрь контейнера
 
 Если что-то не работает - смотри логи!
 
-## 📦 Какие библиотеки используем
+##  Какие библиотеки используем
 
 ```
 pillow            - работа с картинками
@@ -145,7 +146,7 @@ python-dotenv     - загрузка переменных из .env
 multipart         - парсинг загруженных файлов
 ```
 
-## ⚙️ Пагинация (как это работает)
+##  Пагинация 
 
 Вместо того чтобы загружать все 1000 картинок сразу, показываем по 10:
 
@@ -165,7 +166,7 @@ SQL: SELECT * FROM images LIMIT 10 OFFSET 10
 Показываем их и кнопки "Предыдущая/Следующая"
 ```
 
-## 🐛 Если что-то не работает
+##  Если что-то не работает
 
 **Ошибка на порту 5432:**
 ```bash
@@ -188,7 +189,7 @@ docker compose down -v
 docker compose up --build
 ```
 
-## 🧪 Тестирование вручную
+##  Ручное тестирование
 
 ```bash
 # Загрузить картинку
@@ -204,7 +205,7 @@ curl http://localhost/api/images-data/?page=2
 curl -X DELETE http://localhost/api/images/filename.jpg
 ```
 
-## 🌳 Ветки в репо
+##  Ветки в репо
 
 | Ветка | Для чего |
 |-------|----------|
@@ -213,9 +214,9 @@ curl -X DELETE http://localhost/api/images/filename.jpg
 | `feature/frontend` | HTML/CSS/JS |
 | `feature/docker_nginx` | Docker и Nginx |
 | `feature/postgres` | база данных |
-| `feature/pagination` | пагинация (текущая) |
+| `feature/pagination` | пагинация |
 
-## 📝 Чего можно добавить потом
+##  Чего можно добавить потом
 
 - Авторизация (логин/пароль)
 - Профили пользователей
@@ -224,10 +225,7 @@ curl -X DELETE http://localhost/api/images/filename.jpg
 - Кэширование (Redis)
 - Бэкапы базы
 
-## 👤 Кто это писал
-
-Стажер 😊
 
 ---
 
-**Что-то непонятно?** Смотри логи в `logs/app.log` или спроси в коде комментарии
+**Что-то непонятно?** Смотри логи в `logs/app.log`
