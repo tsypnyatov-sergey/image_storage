@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
     const displayFiles = async () => {
-        //const storedFiles = await fetch('/api/images-data/').then(res => res.json()).then(data => data.images);
+        fileListWrapper.innerHTML = '';
 
         const urlParams = new URLSearchParams(window.location.search);
         let page =  urlParams.get('page');
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         currentPage.textContent = page;
 
 
-        // fileListWrapper.innerHTML = '';
+
 
         if (storedFiles.length === 0) {
             if (Number(page) > 1) {
@@ -131,12 +131,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const addDeleteListeners = async () => {
-        document.querySelectorAll('.delete-btn').forEach(async (button) => {
+        document.querySelectorAll('.delete-btn').forEach((button) => {
             button.addEventListener('click', async (event) => {
                 const filename = event.currentTarget.dataset.filename;
-                await fetch(`/api/images/${filename}`, { method: 'DELETE'})
-                    .then(() => { displayFiles(); })
-                    .catch(() => { console.log('File deletion failed')})
+                try {
+                     await fetch(`/api/images/${filename}`, {
+                        method: 'DELETE'
+                     });
+
+                     await displayFiles();
+                } catch (e) {
+                    console.log('File deletion failed');
+                }
             });
         });
     };
