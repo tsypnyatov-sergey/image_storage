@@ -1,10 +1,10 @@
 services:
-    # nginx
+  # nginx
 
   app:
     build:
-        context: .
-        dockerfile: Dockerfile
+      context: .
+      dockerfile: Dockerfile
 
     expose:
       - "8000"
@@ -15,6 +15,9 @@ services:
     env_file:
       - .env
     restart: always
+    depends_on:
+      db:
+        condition: service_healthy
 
 
   nginx:
@@ -28,18 +31,55 @@ services:
       - ./static:/data/static
       - ./logs:/var/log/nginx
 
+    depends_on:
+      - app
+
 
 
 
 
   db:
     image: postgres:17-alpine
+
     env_file:
       - .env
+
     ports:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
-    command: ["postgres", "-c", "log_statement=all"]
+    command: [ "postgres", "-c", "log_statement=all" ]
+
+    restart: always
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+
+  backup:
+    image: postgres:17-alpine
+    env_file:
+      - .env
+
+    depends_on:
+      - db
+
+    volumes:
+      - ./backups:/backups
+      - ./images:/app/images
+      - ./logs:/app/logs
+      - ./nginx.conf:/app/nginx.conf:ro
+      - ./docker-compose.yml:/app/docker-compose.yml:ro
+      - ./backup.sh:/backup.sh:ro
+
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+
+    entrypoint: [ "sh", "/backup.sh" ]
+
 volumes:
   db_data:
+
