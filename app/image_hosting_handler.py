@@ -1,5 +1,11 @@
+"""
+Основной обработчик бизнес-логики приложения.
+"""
+
+from urllib.parse import urlsplit
+
 import logging
-from urllib.parse import urlparse, parse_qs, urlsplit
+
 
 from psycopg import DatabaseError
 
@@ -12,6 +18,9 @@ logger = logging.getLogger(__name__)
 
 # в этом хэндлере должна быть описана бизнес логика
 class ImageHostingHandler(BaseHandler):
+    """
+    Обработчик маршрутов приложения.
+    """
 
     def __init__(self, *args, **kwargs):
         self.db: DBManager = DBManager()
@@ -19,6 +28,10 @@ class ImageHostingHandler(BaseHandler):
 
     # функция принимает GET-запрос и выдает соответствующую страницу
     def do_GET(self):
+        """
+        Обрабатывает GET-запросы.
+        """
+
         logger.info(f"GET {self.client_address[0]}: {self.path}")
 
         if self.path == '/':
@@ -37,6 +50,10 @@ class ImageHostingHandler(BaseHandler):
             self.html_response(f"GET route not found: {self.path}", 404)
 
     def do_POST(self):
+        """
+        Обрабатывает POST-запросы.
+        """
+
         logger.info(f"POST {self.client_address[0]}: {self.path}")
 
         if self.path == "/api/upload":
@@ -58,6 +75,10 @@ class ImageHostingHandler(BaseHandler):
             return
 
     def do_DELETE(self):
+        """
+        Обрабатывает DELETE-запросы.
+        """
+
         logger.info(f"DELETE {self.client_address[0]}: {self.path}")
 
         if self.path.startswith('/api/images/'):
@@ -66,18 +87,24 @@ class ImageHostingHandler(BaseHandler):
             self.delete_image(name, file_type)
 
     def get_images_names(self):
+        """
+        Возвращает список имен изображений.
+        """
 
         self.json_response({
             "images": self.db.get_images_names()
         })
 
     def get_images(self, page: int):
+        """
+        Возвращает изображения для страницы.
+
+        Args:
+            page (int): Номер страницы.
+        """
 
         images = self.db.get_images(page)
-        print("IMAGES TYPE:", type(images))
-
         has_next = self.db.has_next(page)
-        print("HAS_NEXT:", has_next, type(has_next))
 
         res_images = []
 
@@ -93,19 +120,27 @@ class ImageHostingHandler(BaseHandler):
                 upload_time = None
 
             res_images.append({
-                    'id': i[0],
-                    'filename': i[1],
-                    'original_name': i[2],
-                    'size': i[3],
-                    'upload_time': upload_time,
-                    'file_type': i[5]
-                })
+                'id': i[0],
+                'filename': i[1],
+                'original_name': i[2],
+                'size': i[3],
+                'upload_time': upload_time,
+                'file_type': i[5]
+            })
         self.json_response({
             'images': res_images,
             'has_next': has_next
         })
 
     def delete_image(self, name: str, file_type: str):
+        """
+        Удаляет изображение из базы данных и файловой системы.
+
+        Args:
+            name (str): Имя файла.
+            file_type (str): Расширение файла.
+        """
+
         try:
             self.db.delete_image(name)
             (MEDIA_PATH / (name + '.' + file_type)).unlink()

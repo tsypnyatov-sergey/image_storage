@@ -1,3 +1,7 @@
+"""
+Точка входа приложения.
+"""
+
 import logging
 from http.server import ThreadingHTTPServer
 
@@ -17,9 +21,18 @@ logger = logging.getLogger(__name__)
 
 
 def run(server_address=('', 8000),
-        server_class=ThreadingHTTPServer,  # заменил HTTPServer на ThreadingHTTPServer
+        server_class=ThreadingHTTPServer,
         handler_class=ImageHostingHandler
         ):
+    """
+    Запускает HTTP-сервер.
+
+    Args:
+        server_address (tuple): Адрес сервера.
+        server_class: Класс сервера.
+        handler_class: Класс обработчика.
+    """
+
     logger.info(f'Starting server on {server_address}')
     httpd = server_class(server_address, handler_class)
 
